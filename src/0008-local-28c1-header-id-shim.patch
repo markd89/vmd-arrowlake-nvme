@@ -1,0 +1,23 @@
+Add local compat shim: define PCI_DEVICE_ID_INTEL_VMD_28C1
+
+Debian 7.2.12 (and Ubuntu 7.0) kernel headers predate the addition of
+PCI_DEVICE_ID_INTEL_VMD_28C1, so the driver table fails to compile.
+Define the ID numerically behind #ifndef so newer headers are unaffected.
+
+This is a locally-maintained compatibility patch — NOT part of the
+upstream Second Root Bus v10 series by Szymon Durawa.
+
+--- a/drivers/pci/controller/vmd.c
++++ b/drivers/pci/controller/vmd.c
+@@ -1745,6 +1745,11 @@
+ 		.driver_data = VMD_FEAT_HAS_MEMBAR_SHADOW |
+ 				VMD_FEAT_HAS_BUS_RESTRICTIONS |
+ 				VMD_FEAT_CAN_BYPASS_MSI_REMAP,},
++/* Debian 7.2.12 headers lack PCI_DEVICE_ID_INTEL_VMD_28C1 (added later
++ * upstream); define numerically — same shim gvozd188 needed on Ubuntu 7.0. */
++#ifndef PCI_DEVICE_ID_INTEL_VMD_28C1
++#define PCI_DEVICE_ID_INTEL_VMD_28C1	0x28c1
++#endif
+ 	{PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_VMD_28C1),
+ 		.driver_data = VMD_FEAT_HAS_MEMBAR_SHADOW |
+ 				VMD_FEAT_CAN_BYPASS_MSI_REMAP |
