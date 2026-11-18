@@ -82,27 +82,26 @@ if [[ "${BK_FILE}" == *.xz ]]; then
         echo "FAIL: backup fails xz integrity test — refusing to install a corrupt module."; exit 2
     fi
 fi
-# stock path: strip the .xz suffix we added when backing up, to get the real name
-STOCK_NAME="$(basename "${BK_FILE}")"
-STOCK_NAME="${STOCK_NAME%.ko.xz}.ko.xz"; STOCK_NAME="${STOCK_NAME%.ko}.ko"
-STOCK_PATH="${CUR:-/lib/modules/${KVER}/kernel/drivers/pci/controller/vmd.ko}"
-# if the current module lives in updates/, the stock one belongs in the kernel tree
-if [[ "${STOCK_PATH}" == */updates/* ]]; then
-    STOCK_PATH="/lib/modules/${KVER}/kernel/drivers/pci/controller/${STOCK_NAME}"
-fi
-STOCK_DIR="$(dirname "${STOCK_PATH}")"
-mkdir -p "${STOCK_DIR}"
+# canonical kernel-tree name for the stock module file
 if [[ "${BK_FILE}" == *.xz ]]; then
-    cp "${BK_FILE}" "${STOCK_DIR}/${STOCK_NAME}"
+    STOCK_NAME="vmd.ko.xz"
 else
-    cp "${BK_FILE}" "${STOCK_DIR}/${STOCK_NAME%.xz}"
+    STOCK_NAME="vmd.ko"
 fi
+# destination: the patched module's dir if it lives in the kernel tree,
+# otherwise (patched copy in updates/ or none) the stock kernel-tree location
+STOCK_DIR="/lib/modules/${KVER}/kernel/drivers/pci/controller"
+if [[ -n "${CUR}" && -f "${CUR}" && "${CUR}" != */updates/* ]]; then
+    STOCK_DIR="$(dirname "${CUR}")"
+fi
+mkdir -p "${STOCK_DIR}"
+cp "${BK_FILE}" "${STOCK_DIR}/${STOCK_NAME}"
 # remove the patched updates/ copy so it cannot shadow the restored stock one
-if [[ "${CUR}" == */updates/* ]]; then
+if [[ -n "${CUR}" && "${CUR}" == */updates/* ]]; then
     rm -f "${CUR}"
     rmdir --ignore-fail-on-non-empty "$(dirname "${CUR}")" 2>/dev/null || true
 fi
-if [[ ! -s "${STOCK_DIR}/${STOCK_NAME%.xz}" && ! -s "${STOCK_DIR}/${STOCK_NAME}" ]]; then
+if [[ ! -s "${STOCK_DIR}/${STOCK_NAME}" ]]; then
     echo "FAIL: restored module missing at ${STOCK_DIR}/${STOCK_NAME}"; exit 2
 fi
 echo "OK restored: ${STOCK_DIR}/${STOCK_NAME}"
