@@ -188,7 +188,8 @@ sudo ./revert-vmd.sh
 
 ## Alternative: DKMS (auto-rebuild on kernel updates)
 
-The standalone script above must be re-run after every kernel update. If you
+Route B (the standalone `build-vmd.sh`) must be re-run after every kernel
+update. If you
 prefer the module to rebuild automatically, use the DKMS route instead:
 see [dkms/INSTALL-DKMS.md](dkms/INSTALL-DKMS.md). Pick one route — running
 both is harmless (DKMS and the script install to the same path) but
