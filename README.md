@@ -18,7 +18,9 @@ in community testing).
 
  **Caution: Alpha Code**  Not thoroughly tested.  Use or adapt it at your own risk. 
  This software is working for me, but it's possible that differences between my
- system ad usage and your system and usage may conceal unknown defects.
+ system and usage and your system and usage may conceal unknown defects. As this deals
+ with storage and system reliability, you're cautioned to perform your own testing 
+ and validation before using in a production environment.
 
 ---
 
