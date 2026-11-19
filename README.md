@@ -16,6 +16,10 @@ in community testing).
  reproduce the fix. Bug reports with specific, verified corrections are
  welcome and may help the next person.
 
+ **Caution: Alpha Code**  Not thoroughly tested.  Use or adapt it at your own risk. 
+ This software is working for me, but it's possible that differences between my
+ system ad usage and your system and usage may conceal unknown defects.
+
 ---
 
 ## Does this apply to me?
