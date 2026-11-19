@@ -57,6 +57,12 @@ different Intel VMD device ID. This repo's module is built for the
 Core Ultra 200 series device ID (`0xad0b`); other generations need the
 matching upstream kernel, not this patch set.
 
+> **Secure Boot:** the module is unsigned. With Secure Boot enabled
+> (Debian's shim + lockdown), loading it fails with `Key was rejected by
+> service` / `Lockdown: modprobe: unsigned module loading is restricted`.
+> Either disable Secure Boot, or sign the module with your own MOK key
+> (out of scope here — `mokutil --sb-state` tells you your current state).
+
 ## What the fix is (30 seconds)
 
 Three things, layered:
@@ -79,6 +85,53 @@ one small local compatibility patch. Full detail: [docs/how-it-works.md](docs/ho
 
 ## Quick start
 
+**Two routes.** If — and only if — your machine runs the exact kernel the
+prebuilt module was built and validated on, the binary route saves you the
+toolchain setup. Everyone else: build from source.
+
+### Route A — prebuilt binary (exact kernel match only)
+
+The prebuilt module targets **exactly** `7.2.12+deb13-amd64`
+(Debian 13 with the 7.2.12 backports kernel — the validated machine's
+kernel). Check yours:
+
+```bash
+uname -r
+```
+
+Expected: `7.2.12+deb13-amd64`. **Anything else → use Route B.**
+
+Verify and install:
+
+```bash
+sudo ./binary/install-binary.sh
+```
+
+What you should see, in order — each is a gate; the script stops and
+changes **nothing** if any fail:
+
+```
+OK gate 1: sha256 matches
+OK gate 2: running kernel matches (7.2.12+deb13-amd64)
+OK gate 3: vermagic matches
+OK backup: .../vmd.stock.ko.xz
+OK installed: /lib/modules/.../updates/drivers/pci/controller/vmd.ko.xz
+OK kABI gate: modprobe --dry-run vmd resolves
+OK verify: modinfo -n vmd -> /lib/modules/.../updates/...
+DONE. Reboot to load the patched module.
+```
+
+**Common failure:** `FAIL: this prebuilt module targets kernel
+7.2.12+deb13-amd64 only` — you are on a different kernel (or a Debian point
+update moved you off it). Use Route B. The `kABI gate` failure (module
+resolves against your kernel's symbols) is also caught automatically before
+you reboot.
+
+Preview without changing anything: `sudo ./binary/install-binary.sh --check`
+(even without `sudo`: `./binary/install-binary.sh --check` runs gates 1–3 only).
+
+### Route B — build from source (any kernel)
+
 Prerequisites (Debian/Ubuntu family):
 
 ```bash
@@ -95,8 +148,6 @@ Build and install:
 ```bash
 sudo ./build-vmd.sh
 ```
-
-What you should see, in order — each is a gate; the script stops if any fail:
 
 ```
 OK preflight
@@ -115,7 +166,7 @@ in `built/vmd-<kver>/build.log` — your kernel is older than the v10 series
 requires. See [docs/troubleshooting.md](docs/troubleshooting.md) for the
 case-3-only fallback.
 
-Then **reboot**, and verify:
+Then **reboot**, and verify (same checks for both routes):
 
 ```bash
 lspci | grep "^1000[0-9]:"

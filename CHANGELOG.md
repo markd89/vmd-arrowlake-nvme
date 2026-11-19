@@ -5,6 +5,12 @@
 Initial public release of the repo packaging.
 
 ### Added
+- `binary/` — the prebuilt, hardware-validated module `vmd-7.2.12-v10.ko`
+  (+ sha256) and `install-binary.sh`, a gated installer (sha256 → kernel
+  match → vermagic → backup-first → depmod/initramfs → `modprobe --dry-run`
+  kABI gate → verify). Exact-kernel fast path: targets only
+  `7.2.12+deb13-amd64`; any other kernel is redirected to the build route
+  before anything is modified.
 - `src/vmd.c` — pristine Linux 7.4-rc1 VMD controller driver (byte-verified
   reconstruction: applying the full patch stack reproduces the exact source
   of the validated `vmd-7.2.12-v10.ko` build).
