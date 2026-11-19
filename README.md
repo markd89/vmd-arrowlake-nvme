@@ -9,13 +9,12 @@ Built and validated on an Acer Predator PH18-73 with two NVMe drives. It is
 (MSI Vector 17 HX AI and Acer Predator PH16-73/PHN16-73 have been confirmed
 in community testing).
 
-> **Scope:** this repo covers the kernel module only — building it,
-> installing it, and reverting it. It does not cover rescue ISOs or imaging
-> tools (Clonezilla etc.), though the same module works inside them.
->
-> **Support:** none is offered. This is published as-is so that others can
-> reproduce the fix. Bug reports with specific, verified corrections are
-> welcome and may help the next person.
+**Scope:** this repo covers the kernel module only — building it,
+ installing it, and reverting it. 
+
+**Support:** none is offered. This is published as-is so that others can
+ reproduce the fix. Bug reports with specific, verified corrections are
+ welcome and may help the next person.
 
 ---
 
@@ -57,11 +56,11 @@ different Intel VMD device ID. This repo's module is built for the
 Core Ultra 200 series device ID (`0xad0b`); other generations need the
 matching upstream kernel, not this patch set.
 
-> **Secure Boot:** the module is unsigned. With Secure Boot enabled
-> (Debian's shim + lockdown), loading it fails with `Key was rejected by
-> service` / `Lockdown: modprobe: unsigned module loading is restricted`.
-> Either disable Secure Boot, or sign the module with your own MOK key
-> (out of scope here — `mokutil --sb-state` tells you your current state).
+ **Secure Boot:** the module is unsigned. With Secure Boot enabled
+ (Debian's shim + lockdown), loading it fails with `Key was rejected by
+ service` / `Lockdown: modprobe: unsigned module loading is restricted`.
+ Either disable Secure Boot, or sign the module with your own MOK key
+ (out of scope here — `mokutil --sb-state` tells you your current state).
 
 ## What the fix is (30 seconds)
 
